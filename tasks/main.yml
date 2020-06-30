@@ -1,0 +1,48 @@
+---
+- block:
+  - name: Install PHP CLI 73
+    became: true
+    yum:
+      name: '{{ packages }}'
+    vars:
+      packages:
+      - remi-release-7.rpm
+      - epel-release yum-utils
+    disablerepo:
+      - remi-php54
+    enablerepo:
+      - remi-php73
+    yum: 
+      name: '{{libreries}}'
+    vars:
+      libreries:
+        - php
+        - php-cli
+        - php-fpm
+        - php-mysqlnd
+        - php-zip
+        - php-devel
+        - php-gd
+        - php-mcrypt
+        - php-mbstring
+        - php-curl
+        - php-xml
+        - php-pear
+        - php-bcmath
+        - php-json
+
+  - name: Download Composer
+    become: true
+    script: library/install-composer.sh
+  
+  - name: Move Composer globally
+    become: yes
+    command: mv composer.phar /usr/local/bin/composer
+    file:
+      path: /usr/local/bin/composer
+      mode: "a+x"
+
+  - composer:
+      command: create-project
+      arguments: apigee/devportal-kickstart-project:8.x-dev
+      working_dir: /home/centos/devportal8
